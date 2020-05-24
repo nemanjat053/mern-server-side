@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const HttpError = require("./models/http-error");
 
 // Getting routes from 'Routes' folder
 const placesRoutes = require("./routes/places-routes");
@@ -12,6 +13,13 @@ app.use(bodyParser.json());
 // Using middleware
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);
+
+
+// Middleware for unsupported routes
+app.use((req, res, next) => {
+  const error = new HttpError("Could not found this route.", 404);
+  throw error;
+});
 
 // Middleware for error handling
 app.use((error, req, res, next) => {
