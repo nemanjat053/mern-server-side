@@ -7,6 +7,7 @@ const userRoutes = require("./routes/users-routes");
 
 const app = express();
 
+app.use(bodyParser.json());
 // Definition routes
 // Using middleware
 app.use("/api/places", placesRoutes);
