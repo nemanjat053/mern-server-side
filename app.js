@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const HttpError = require("./models/http-error");
+const mongoose = require("mongoose");
 
 // Getting routes from 'Routes' folder
 const placesRoutes = require("./routes/places-routes");
@@ -13,7 +14,6 @@ app.use(bodyParser.json());
 // Using middleware
 app.use("/api/places", placesRoutes);
 app.use("/api/users", userRoutes);
-
 
 // Middleware for unsupported routes
 app.use((req, res, next) => {
@@ -33,6 +33,15 @@ app.use((error, req, res, next) => {
 });
 
 // Server starts on PORT :5000 (localhost:5000)
-app.listen(5000);
-
-// Getting place by user id
+// Connecting to mongoose server
+mongoose
+  .connect("mongodb://localhost:27017/mernApp", {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => {
+    console.log("Error with starting server : | " + err);
+  });

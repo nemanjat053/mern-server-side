@@ -2,6 +2,8 @@ const HttpError = require("../models/http-error");
 const { v1: uuidv1 } = require("uuid");
 const { validationResult } = require("express-validator");
 
+const Place = require("../models/place");
+
 // Dummy data for places
 let DUMMY_PLACES = [
   {
@@ -14,28 +16,6 @@ let DUMMY_PLACES = [
     },
     address: "20 W 35th St, New Your NY 10001",
     creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Empire state building",
-    description: "One of the most famous skys in the world",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 35th St, New Your NY 10001",
-    creator: "u1",
-  },
-  {
-    id: "p3",
-    title: "Empire state building",
-    description: "One of the most famous skys in the world",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 35th St, New Your NY 10001",
-    creator: "u2",
   },
 ];
 
@@ -75,25 +55,32 @@ const getPlacesByUsersId = (req, res, next) => {
   res.json({ places });
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     throw new HttpError("Invalid inputs passed, please check your data", 422);
   }
 
   const { title, description, coordinates, address, creator } = req.body;
-  const createdPlace = {
-    id: uuidv1(), // Added id
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      "https://www.nycgo.com/images/venues/1097/wall-street-photo-tagger-yancey-iv-nyc-and-company-02-2__x_large.jpg",
     creator,
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace);
+  // Try/Catch block fro adding data
+  try {
+    await createdPlace.save();
+  } catch (err) {
+    const error = new HttpError("Creating place failed, please try again" + err, 500);
+    return next(error);
+  }
 
-  res.status(201).json({ createdPlace });
+  res.status(201).json({ place: createdPlace });
 };
 
 const updatePlaceById = (req, res, next) => {
