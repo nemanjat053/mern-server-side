@@ -45,3 +45,5 @@ mongoose
   .catch((err) => {
     console.log("Error with starting server : | " + err);
   });
+
+mongoose.set("useCreateIndex", true);
