@@ -17,6 +17,8 @@ const getUsers = (req, res, next) => {
   res.status(200).json({ message: DUMMY_USERS });
 };
 
+
+// Function for signup
 const signup = async (req, res, next) => {
   // Checking for validation errors
   const errors = validationResult(req);
@@ -69,16 +71,24 @@ const signup = async (req, res, next) => {
   });
 };
 
-const login = (req, res, next) => {
+// Function for log in
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  const identifiedUser = DUMMY_USERS.find((u) => u.email === email);
-
-  if (!identifiedUser || identifiedUser.password !== password) {
-    throw new HttpError("Could not identify user.", 401);
+  let user;
+  try {
+    user = await User.find({ email: email });
+  } catch (err) {
+    const error = new HttpError("Could not find any users.", 500);
+    return next(error);
   }
 
-  res.json({ message: "Loged in." });
+  if (!user || user.password !== password) {
+    const error = new HttpError("Could not identify user.", 401);
+    return next(error);
+  }
+
+  res.status(200).json({ message: "Logged in" });
 };
 
 exports.getUsers = getUsers;
