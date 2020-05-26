@@ -11,7 +11,8 @@ const placeSchema = new Schema({
     lat: { type: Number, require: true },
     lng: { type: Number, require: true },
   },
-  creator: { type: String, require: true },
+  // {} one user
+  creator: { type: mongoose.Types.ObjectId, require: true, ref: "User" },
 });
 
 // Exporting schema

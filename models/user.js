@@ -8,7 +8,8 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, minlength: 6 },
   image: { type: String, required: true },
-  places: { type: String, required: true },
+  // [] Many places
+  place: [{ type: mongoose.Types.ObjectId, require: true, ref: "Place" }],
 });
 
 // Exporting schema

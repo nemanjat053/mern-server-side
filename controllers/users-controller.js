@@ -13,10 +13,17 @@ const DUMMY_USERS = [
   },
 ];
 
-const getUsers = (req, res, next) => {
-  res.status(200).json({ message: DUMMY_USERS });
-};
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError("Could not find any users.", 500);
+    return next(error);
+  }
 
+  res.json({ users: users.map((user) => user.toObject({ getters: tru })) });
+};
 
 // Function for signup
 const signup = async (req, res, next) => {
@@ -52,7 +59,7 @@ const signup = async (req, res, next) => {
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1024px-User_icon_2.svg.png",
     password,
-    places,
+    places: [],
   });
 
   try {
@@ -79,12 +86,15 @@ const login = async (req, res, next) => {
   try {
     user = await User.find({ email: email });
   } catch (err) {
-    const error = new HttpError("Could not find any users.", 500);
+    const error = new HttpError("Logging in failed.", 500);
     return next(error);
   }
 
   if (!user || user.password !== password) {
-    const error = new HttpError("Could not identify user.", 401);
+    const error = new HttpError(
+      "Invalid credentials, could not log you in.",
+      401
+    );
     return next(error);
   }
 
