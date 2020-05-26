@@ -10,6 +10,18 @@ const userRoutes = require("./routes/users-routes");
 const app = express();
 
 app.use(bodyParser.json());
+
+// Middleware for CORS
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  // Methods to allow
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  next();
+});
 // Definition routes
 // Using middleware
 app.use("/api/places", placesRoutes);
